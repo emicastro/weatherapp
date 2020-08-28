@@ -15,6 +15,22 @@ class AddCityPage extends StatelessWidget {
         child: Column(
           children: <Widget>[
             HeaderWidget(title: 'Add city'),
+            const SizedBox(height: 15),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15.0),
+              child: TextField(
+                decoration: InputDecoration(
+                    focusedBorder: InputBorder.none,
+                    border: InputBorder.none,
+                    filled: true,
+                    hintText: 'Search city',
+                    fillColor: Colors.grey[200],
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.grey,
+                    )),
+              ),
+            )
           ],
         ),
       ),
