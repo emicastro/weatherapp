@@ -1,7 +1,31 @@
-import 'package:flutter/material.dart';
-import 'package:weatherapp/ui/common/header_widget.dart';
+import 'dart:convert';
 
-class AddCityPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:weatherapp/data/data_constants.dart';
+import 'package:weatherapp/ui/common/debouncer.dart';
+import 'package:weatherapp/ui/common/header_widget.dart';
+import 'package:http/http.dart' as http;
+
+class AddCityPage extends StatefulWidget {
+  @override
+  _AddCityPageState createState() => _AddCityPageState();
+}
+
+class _AddCityPageState extends State<AddCityPage> {
+  final debouncer = Debouncer();
+
+  void onChangedText(String text) {
+    debouncer.run(() {
+      requestSearch(text);
+    });
+  }
+
+  void requestSearch(String text) async {
+    final url = '${API}search/?query=$text';
+    final response = await http.get(url);
+    final data = jsonDecode(response.body);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +43,7 @@ class AddCityPage extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: TextField(
+                onChanged: onChangedText,
                 decoration: InputDecoration(
                     focusedBorder: InputBorder.none,
                     border: InputBorder.none,
