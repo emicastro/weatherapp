@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:weatherapp/ui/cities/cities_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key key}) : super(key: key);
+
+  void handleNavigateTap(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => CitiesPage()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +64,7 @@ class HomePage extends StatelessWidget {
                       'Add city',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    onPressed: () {},
+                    onPressed: () => handleNavigateTap(context),
                   )
                 ],
               ),
