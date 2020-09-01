@@ -20,8 +20,8 @@ class _LoaderWidgetState extends State<LoaderWidget>
 
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   @override
