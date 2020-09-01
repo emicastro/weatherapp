@@ -6,6 +6,7 @@ import 'package:weatherapp/model/city.dart';
 import 'package:weatherapp/ui/common/debouncer.dart';
 import 'package:weatherapp/ui/common/header_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:weatherapp/ui/common/loader_widget.dart';
 import 'package:weatherapp/ui/ui_constants.dart';
 
 class AddCityPage extends StatefulWidget {
@@ -16,18 +17,24 @@ class AddCityPage extends StatefulWidget {
 class _AddCityPageState extends State<AddCityPage> {
   final debouncer = Debouncer();
   List<City> cities = [];
+  bool loading = false;
 
   void onChangedText(String text) {
     debouncer.run(() {
-      requestSearch(text);
+      if (text.isNotEmpty) requestSearch(text);
     });
   }
 
   void requestSearch(String text) async {
+    setState(() {
+      loading = true;
+    });
+
     final url = '${API}search/?query=$text';
     final response = await http.get(url);
     final data = jsonDecode(response.body) as List;
     setState(() {
+      loading = false;
       cities = data.map((e) => City.fromJson(e)).toList();
     });
   }
@@ -84,7 +91,11 @@ class _AddCityPageState extends State<AddCityPage> {
                       ),
                     );
                   }),
-            )
+            ),
+            if (loading)
+              Center(
+                child: LoaderWidget(),
+              )
           ],
         ),
       ),
