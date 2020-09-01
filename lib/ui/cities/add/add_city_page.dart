@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:weatherapp/data/data_constants.dart';
+import 'package:weatherapp/model/city.dart';
 import 'package:weatherapp/ui/common/debouncer.dart';
 import 'package:weatherapp/ui/common/header_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:weatherapp/ui/ui_constants.dart';
 
 class AddCityPage extends StatefulWidget {
   @override
@@ -13,6 +15,7 @@ class AddCityPage extends StatefulWidget {
 
 class _AddCityPageState extends State<AddCityPage> {
   final debouncer = Debouncer();
+  List<City> cities = [];
 
   void onChangedText(String text) {
     debouncer.run(() {
@@ -23,7 +26,10 @@ class _AddCityPageState extends State<AddCityPage> {
   void requestSearch(String text) async {
     final url = '${API}search/?query=$text';
     final response = await http.get(url);
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(response.body) as List;
+    setState(() {
+      cities = data.map((e) => City.fromJson(e)).toList();
+    });
   }
 
   @override
@@ -55,6 +61,29 @@ class _AddCityPageState extends State<AddCityPage> {
                       color: Colors.grey,
                     )),
               ),
+            ),
+            const SizedBox(height: 25),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: cities.length,
+                  itemBuilder: (context, index) {
+                    final city = cities[index];
+                    return ListTile(
+                      title: Text(
+                        city.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: primaryColor,
+                        ),
+                        onPressed: () => {},
+                      ),
+                    );
+                  }),
             )
           ],
         ),
