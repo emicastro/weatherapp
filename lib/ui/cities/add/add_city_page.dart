@@ -63,7 +63,7 @@ class _AddCityPageState extends State<AddCityPage> {
                               Icons.add,
                               color: primaryColor,
                             ),
-                            onPressed: () => {},
+                            onPressed: () => {bloc.addCity(city)},
                           ),
                         );
                       }),

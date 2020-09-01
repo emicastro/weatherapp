@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:weatherapp/data/data_constants.dart';
 import 'package:weatherapp/model/city.dart';
+import 'package:weatherapp/model/weather.dart';
 import 'package:weatherapp/ui/common/debouncer.dart';
 import 'package:http/http.dart' as http;
 
@@ -25,7 +26,19 @@ class AddCityBloc extends ChangeNotifier {
     final response = await http.get(url);
     final data = jsonDecode(response.body) as List;
     loading = false;
+
     cities = data.map((e) => City.fromJson(e)).toList();
     notifyListeners();
+  }
+
+  void addCity(City city) async {
+    // TODO: Check if is persisted
+    final url = '$API${city.id}';
+    final response = await http.get(url);
+    final data = jsonDecode(response.body);
+    final weatherData = data['consolidated_weather'] as List;
+    final weathers = weatherData.map((e) => Weather.fromJson(e)).toList();
+
+    final newCity = city.fromWeathers(weathers);
   }
 }
