@@ -45,6 +45,11 @@ class _AddCityPageState extends State<AddCityPage> {
                         )),
                   ),
                 ),
+                if (bloc.errorMessage != null)
+                  Text(
+                    bloc.errorMessage,
+                    style: TextStyle(color: Colors.red[300]),
+                  ),
                 const SizedBox(height: 25),
                 Expanded(
                   child: ListView.builder(
