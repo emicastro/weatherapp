@@ -92,21 +92,24 @@ class CityItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.grey[200],
-      padding: const EdgeInsets.all(20.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            city.title,
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
-          ),
-          InkWell(
-            onTap: () {},
-            child: Icon(Icons.close),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Container(
+        color: Colors.grey[200],
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              city.title,
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+            ),
+            InkWell(
+              onTap: () {},
+              child: Icon(Icons.close),
+            ),
+          ],
+        ),
       ),
     );
   }
