@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weatherapp/data/repository/store_repository.dart';
 import 'package:weatherapp/model/city.dart';
 import 'package:weatherapp/ui/cities/add/add_city_page.dart';
 import 'package:weatherapp/ui/cities/cities_bloc.dart';
@@ -19,15 +20,15 @@ class _CitiesPageState extends State<CitiesPage> {
       barrierDismissible: false,
       builder: (context) => Center(
         child: AlertDialog(
-          title: Text('Confirmation'),
-          content: Text('Are you sure you want to delete ${city.title}?'),
+          title: Text('Confirmación'),
+          content: Text('Seguro que desea eliminar la ciudad ${city.title}?'),
           actions: <Widget>[
             OutlineButton(
               child: Text('NO'),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             OutlineButton(
-              child: Text('YES'),
+              child: Text('SI'),
               onPressed: () => Navigator.of(context).pop(true),
             )
           ],
@@ -41,6 +42,9 @@ class _CitiesPageState extends State<CitiesPage> {
 
   @override
   void initState() {
+    bloc = CitiesBloc(
+      storage: context.read<StoreRepository>(),
+    );
     bloc.loadCities();
     super.initState();
   }
@@ -48,17 +52,19 @@ class _CitiesPageState extends State<CitiesPage> {
   void handleNavigatePress(BuildContext context) async {
     await Navigator.of(context).push(
       PageRouteBuilder(
-          transitionDuration: const Duration(
-            milliseconds: 400,
-          ),
-          pageBuilder: (_, animation1, animation2) {
-            return SlideTransition(
-              position:
-                  Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset(0.0, 0.0))
-                      .animate(animation1),
-              child: AddCityPage(),
-            );
-          }),
+        transitionDuration: const Duration(
+          milliseconds: 400,
+        ),
+        pageBuilder: (_, animation1, animation2) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(0.0, 1.0),
+              end: Offset(0.0, 0.0),
+            ).animate(animation1),
+            child: AddCityPage(),
+          );
+        },
+      ),
     );
     bloc.loadCities();
   }
@@ -66,22 +72,29 @@ class _CitiesPageState extends State<CitiesPage> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-        animation: bloc,
-        builder: (context, child) {
-          return Scaffold(
-            appBar: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.white,
-              iconTheme: IconThemeData(color: Colors.black),
+      animation: bloc,
+      builder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(
+              color: Colors.black,
             ),
-            floatingActionButton: FloatingActionButton(
+          ),
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(bottom: 20.0),
+            child: FloatingActionButton(
               child: Icon(Icons.add),
               backgroundColor: primaryColor,
               onPressed: () => handleNavigatePress(context),
             ),
-            body: Padding(
+          ),
+          body: Center(
+            child: Padding(
               padding: const EdgeInsets.all(25),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   HeaderWidget(
                     title: 'My cities',
@@ -89,32 +102,41 @@ class _CitiesPageState extends State<CitiesPage> {
                   Expanded(
                     child: bloc.cities.isEmpty
                         ? Center(
-                            child: Text(
-                              "You didn't add any cities yet :(",
-                              style: TextStyle(fontSize: 16),
-                            ),
+                            child: Text("You didn't add any cities yet :("),
                           )
                         : ListView.builder(
+                            padding: const EdgeInsets.only(
+                              bottom: 20,
+                            ),
                             itemCount: bloc.cities.length,
                             itemBuilder: (context, index) {
                               final city = bloc.cities[index];
                               return CityItem(
                                 city: city,
+                                onTap: () => handleDeleteTap(city),
                               );
-                            }),
-                  )
+                            },
+                          ),
+                  ),
                 ],
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
 
 class CityItem extends StatelessWidget {
   final City city;
+  final VoidCallback onTap;
 
-  const CityItem({Key key, this.city}) : super(key: key);
+  const CityItem({
+    Key key,
+    this.city,
+    this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -128,11 +150,16 @@ class CityItem extends StatelessWidget {
           children: <Widget>[
             Text(
               city.title,
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+              ),
             ),
             InkWell(
-              onTap: () {},
-              child: Icon(Icons.close),
+              onTap: onTap,
+              child: Icon(
+                Icons.close,
+              ),
             ),
           ],
         ),

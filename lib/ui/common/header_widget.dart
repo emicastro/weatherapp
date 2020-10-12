@@ -14,7 +14,10 @@ class HeaderWidget extends StatelessWidget {
           padding: const EdgeInsets.only(left: 15.0),
           child: Text(
             title,
-            style: TextStyle(fontSize: 23, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              fontSize: 23,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
         const SizedBox(

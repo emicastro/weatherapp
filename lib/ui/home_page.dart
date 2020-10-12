@@ -1,78 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:weatherapp/data/repository/api_repository.dart';
+import 'package:weatherapp/data/repository/store_repository.dart';
 import 'package:weatherapp/ui/cities/cities_page.dart';
-import 'package:weatherapp/ui/ui_constants.dart';
+import 'package:weatherapp/ui/common/loader_widget.dart';
+import 'package:weatherapp/ui/home/empty_widget.dart';
+import 'package:weatherapp/ui/home/weathers_widget.dart';
+import 'package:weatherapp/ui/home_bloc.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
-  void handleNavigateTap(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => CitiesPage()));
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  HomeBloc bloc;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      bloc.loadCities();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void initState() {
+    bloc = HomeBloc(
+      apiService: context.read<ApiRepository>(),
+      storage: context.read<StoreRepository>(),
+    );
+    bloc.loadCities();
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void handleNavigatePress(BuildContext context) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => CitiesPage()),
+    );
+    bloc.loadCities();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(
-      fit: StackFit.expand,
-      children: [
-        Positioned.fill(
-            child: Image.asset(
-          'assets/welcome.jpg',
-        )),
-        SafeArea(
-          child: Center(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: maxWidth,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Image.asset('assets/logo.png', height: 60),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  Text('Hi!\nWelcome',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontSize: 45,
-                        fontWeight: FontWeight.bold,
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Where you want to go?',
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  RaisedButton(
-                    color: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                      15.0,
-                    )),
-                    child: Text(
-                      'Add city',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    onPressed: () => handleNavigateTap(context),
-                  )
-                ],
-              ),
-            ),
-          ),
-        )
-      ],
-    ));
+    return AnimatedBuilder(
+      animation: bloc,
+      builder: (context, child) {
+        return Scaffold(
+          body: bloc.cities.isEmpty
+              ? bloc.loading
+                  ? Center(child: LoaderWidget())
+                  : EmptyWidget(
+                      onTap: () => handleNavigatePress(context),
+                    )
+              : WeathersWidget(
+                  cities: bloc.cities,
+                  onTap: () => handleNavigatePress(context),
+                ),
+        );
+      },
+    );
   }
 }

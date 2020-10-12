@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:weatherapp/data/repository/api_repository.dart';
 import 'package:weatherapp/data/repository/store_repository.dart';
 import 'package:weatherapp/model/city.dart';

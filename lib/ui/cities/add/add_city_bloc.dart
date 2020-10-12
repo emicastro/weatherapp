@@ -1,14 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:weatherapp/data/data_constants.dart';
 import 'package:weatherapp/data/repository/api_repository.dart';
-import 'package:weatherapp/data/repository/store_impl.dart';
 import 'package:weatherapp/data/repository/store_repository.dart';
 import 'package:weatherapp/model/city.dart';
-import 'package:weatherapp/model/weather.dart';
 import 'package:weatherapp/ui/common/debouncer.dart';
-import 'package:http/http.dart' as http;
 
 class AddCityBloc extends ChangeNotifier {
   final debouncer = Debouncer();
@@ -24,9 +18,11 @@ class AddCityBloc extends ChangeNotifier {
   });
 
   void onChangedText(String text) {
-    debouncer.run(() {
-      if (text.isNotEmpty) requestSearch(text);
-    });
+    debouncer.run(
+      () {
+        if (text.isNotEmpty) requestSearch(text);
+      },
+    );
   }
 
   void requestSearch(String text) async {
@@ -42,7 +38,6 @@ class AddCityBloc extends ChangeNotifier {
   Future<bool> addCity(City city) async {
     loading = true;
     notifyListeners();
-
     final newCity = await apiService.getWeathers(city);
     try {
       await storage.saveCity(newCity);
