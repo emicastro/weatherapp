@@ -1,1 +1,2 @@
-const API = 'https://www.metaweather.com/api/location/';
+const api = '$server/api/location/';
+const server = 'https://www.metaweather.com';
