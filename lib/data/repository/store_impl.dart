@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weatherapp/model/city.dart';
 
 const keyCities = 'cities';
+const keyLastUpdate = 'last_update';
 
 class StoreImpl extends StoreRepository {
   @override
@@ -45,6 +46,22 @@ class StoreImpl extends StoreRepository {
       keyCities,
       cities.map((e) => jsonEncode(e.toJson())).toList(),
     );
+  }
+
+  @override
+  Future<DateTime> getLastUpdate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final data = prefs.getInt(keyLastUpdate);
+    if (data != null && data > 0) {
+      return DateTime.fromMillisecondsSinceEpoch(data);
+    }
+    return null;
+  }
+
+  @override
+  Future<void> saveLastUpdate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt(keyLastUpdate, DateTime.now().millisecondsSinceEpoch);
   }
 
   @override
