@@ -37,4 +37,13 @@ class StoreImpl extends StoreRepository {
     prefs.setStringList(
         keyCities, list.map((e) => jsonEncode(e.toJson())).toList());
   }
+
+  @override
+  Future<void> saveCities(List<City> cities) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(
+      keyCities,
+      cities.map((e) => jsonEncode(e.toJson())).toList(),
+    );
+  }
 }
