@@ -46,4 +46,11 @@ class StoreImpl extends StoreRepository {
       cities.map((e) => jsonEncode(e.toJson())).toList(),
     );
   }
+
+  @override
+  Future<void> deleteCity(City city) async {
+    final cities = await getCities();
+    cities.removeWhere((element) => element.id == city.id);
+    saveCities(cities);
+  }
 }
