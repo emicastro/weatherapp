@@ -11,7 +11,33 @@ class CitiesPage extends StatefulWidget {
 }
 
 class _CitiesPageState extends State<CitiesPage> {
-  final bloc = CitiesBloc();
+  CitiesBloc bloc;
+
+  void handleDeleteTap(City city) async {
+    final result = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: AlertDialog(
+          title: Text('Confirmation'),
+          content: Text('Are you sure you want to delete ${city.title}?'),
+          actions: <Widget>[
+            OutlineButton(
+              child: Text('NO'),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            OutlineButton(
+              child: Text('YES'),
+              onPressed: () => Navigator.of(context).pop(true),
+            )
+          ],
+        ),
+      ),
+    );
+    if (result) {
+      bloc.deleteCity(city);
+    }
+  }
 
   @override
   void initState() {
