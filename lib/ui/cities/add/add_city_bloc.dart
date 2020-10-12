@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:weatherapp/data/data_constants.dart';
+import 'package:weatherapp/data/repository/api_repository.dart';
 import 'package:weatherapp/data/repository/store_impl.dart';
 import 'package:weatherapp/data/repository/store_repository.dart';
 import 'package:weatherapp/model/city.dart';
@@ -11,10 +12,16 @@ import 'package:http/http.dart' as http;
 
 class AddCityBloc extends ChangeNotifier {
   final debouncer = Debouncer();
-  final StoreRepository storage = StoreImpl();
+  final StoreRepository storage;
+  final ApiRepository apiService;
   List<City> cities = [];
   bool loading = false;
   String errorMessage;
+
+  AddCityBloc({
+    @required this.storage,
+    @required this.apiService,
+  });
 
   void onChangedText(String text) {
     debouncer.run(() {
@@ -26,33 +33,26 @@ class AddCityBloc extends ChangeNotifier {
     loading = true;
     notifyListeners();
 
-    final url = '${API}search/?query=$text';
-    final response = await http.get(url);
-    final data = jsonDecode(response.body) as List;
-    loading = false;
+    cities = await apiService.getCities(text);
 
-    cities = data.map((e) => City.fromJson(e)).toList();
+    loading = false;
     notifyListeners();
   }
 
-  void addCity(City city) async {
+  Future<bool> addCity(City city) async {
     loading = true;
     notifyListeners();
 
-    final url = '$API${city.id}';
-    final response = await http.get(url);
-    final data = jsonDecode(response.body);
-    final weatherData = data['consolidated_weather'] as List;
-    final weathers = weatherData.map((e) => Weather.fromJson(e)).toList();
-    final newCity = city.fromWeathers(weathers);
+    final newCity = await apiService.getWeathers(city);
     try {
-      storage.saveCity(newCity);
+      await storage.saveCity(newCity);
       errorMessage = null;
+      return true;
     } on Exception catch (ex) {
       errorMessage = ex.toString();
+      loading = false;
+      notifyListeners();
+      return false;
     }
-
-    loading = false;
-    notifyListeners();
   }
 }
